@@ -48,7 +48,11 @@ class YouTubePlayer():
         101: "480p vp8 webm stereo",
         102: "720p vp8 webm stereo",
         120: "hd720",
-        121: "hd1080"
+        121: "hd1080",
+        136: "hd720",
+        137: "hd1080",
+        264: "hd14440p",
+        138: "4k"
         }
 
     # YouTube Playback Feeds
@@ -225,8 +229,10 @@ class YouTubePlayer():
         return video_url
 
     def userSelectsVideoQuality(self, params, links):
-        levels =    [([37,121], u"1080p"),
-                     ([22,45,120], u"720p"),
+        levels =    [([138], u"4k"),
+                     ([264], u"1440p"),
+                     ([37,121,137], u"1080p"),
+                     ([22,45,120,136], u"720p"),
                      ([35,44], u"480p"),
                      ([18], u"380p"),
                      ([34,43],u"360p"),
@@ -357,7 +363,12 @@ class YouTubePlayer():
         if flashvars.has_key(u"hlsvp"):                               
             video[u"hlsvp"] = flashvars[u"hlsvp"]    
 
-        for url_desc in flashvars[u"url_encoded_fmt_stream_map"].split(u","):
+        allStream = flashvars[u"url_encoded_fmt_stream_map"].split(u",")
+        
+        if flashvars.has_key(u"adaptive_fmts"):
+            allStream = allStream + flashvars[u"adaptive_fmts"].split(u",")
+            
+        for url_desc in allStream:
             url_desc_map = cgi.parse_qs(url_desc)
             self.common.log(u"url_map: " + repr(url_desc_map), 2)
             if not (url_desc_map.has_key(u"url") or url_desc_map.has_key(u"stream")):
